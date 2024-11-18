@@ -21,10 +21,12 @@ n_mfcc = 13
 max_pad_len = 200
 
 def extract_mfcc(audio_file, n_mfcc=n_mfcc, max_pad_len=max_pad_len):
+    """Extract MFCC features from an audio file with padding or truncating."""
     try:
         y, sr = librosa.load(audio_file, sr=None)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc)
         
+        # Padding or truncating
         if mfcc.shape[1] < max_pad_len:
             pad_width = max_pad_len - mfcc.shape[1]
             mfcc = np.pad(mfcc, pad_width=((0, 0), (0, pad_width)), mode='constant')
@@ -39,6 +41,7 @@ def extract_mfcc(audio_file, n_mfcc=n_mfcc, max_pad_len=max_pad_len):
 def predict_file(file_path):
     """Predicts the class of a single audio file using the trained model."""
     mfcc = extract_mfcc(file_path)
+    # print(mfcc)
     if mfcc is None:
         return "Could not process the file."
     
@@ -54,7 +57,7 @@ def predict_file(file_path):
 @api_view(['POST'])
 def analyze_audio(request):
     """Handles the uploaded audio file and returns the prediction."""
-    print(request.data)
+    # print(request.data)
     serializer = AudioFileSerializer(data=request.data)
     if serializer.is_valid():
         audio_file = serializer.validated_data['file']
@@ -67,8 +70,9 @@ def analyze_audio(request):
                 f.write(chunk)
 
         # Make prediction
-        file_path2 = os.path.join(os.getcwd(),'temp_audio', 'adrso031.wav')
-        predicted_class = predict_file(file_path)
+        # file_path2 = os.path.join(os.getcwd(),'temp_audio', 'ID33_pd_3_2_2_readtext.wav')
+        file_path2 = os.path.join(os.getcwd(),'temp_audio', 'adrso007.wav')
+        predicted_class = predict_file(file_path2)
         print(predicted_class)
         # Clean up by removing the temporary file
         # os.remove(file_path)
